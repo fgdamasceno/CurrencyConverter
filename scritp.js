@@ -248,9 +248,27 @@ const setCurrencyValues = async () => {
   }
   // Set the rate values for the rate inputs
   for (let i = 0; i < currencyRates.length; i++) {
-    rateInputElements[i].value = currencyRates[i];
+    rateInputElements[i].value = Number(
+      currencyRates[i] * currencyInputMain.value
+    ).toFixed(2);
   }
 };
 setCurrencyValues();
 
 // Updates the currency values
+const updateCurrencyValues = () => {
+  // Set the rate values based on the dropdown selection
+  currencySelectElements.forEach((selectEl) => {
+    selectEl.addEventListener("change", (e) => {
+      selectEl.value = e.target.value;
+      setCurrencyValues();
+    });
+  });
+
+  // Update values when a new one is typed in the 'currencyInputMain' element
+  currencyInputMain.addEventListener("input", async (e) => {
+    currencyInputMain.value = Number(e.target.value) || "";
+    setCurrencyValues();
+  });
+};
+updateCurrencyValues();
