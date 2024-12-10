@@ -170,6 +170,7 @@ const supportedCurrencies = [
   put then in alphabetical order and assign then to a new array
   that will be used to set the 'option' elements values
 */
+
 const currencyNames = [];
 for (let i = 0; i < supportedCurrencies.length; i++) {
   currencyNames.push(supportedCurrencies[i][1]);
@@ -188,21 +189,19 @@ let currencyInputTwo = document.querySelector(".currency-input-two");
 let currencyInputThree = document.querySelector(".currency-input-three");
 // All select and input elements
 let currencySelectElements = document.querySelectorAll("select");
-let currencyInputElements = document.querySelectorAll("input");
+let rateInputElements = document.querySelectorAll(".rate-input");
 let optionElements = document.querySelectorAll("option");
 
 // ExchangeRate-API
 const API_URL = "https://api.exchangerate-api.com/v4/latest/";
 
 // Fetching the API
-const getCurrencyData = async (code) => {
+const getCurrencyData = async (code, rate) => {
   try {
     const res = await fetch(`${API_URL}${code.toUpperCase()}`);
     const data = await res.json();
-    const rate = data.rates[code];
-    const base = data.base;
-    // console.log(rate); // REMOVE LATER
-    // console.log(base); // REMOVE LATER
+    const exchangeRate = data.rates[rate];
+    return exchangeRate;
   } catch (err) {
     console.log("Could not fetch currency data!", err);
   }
@@ -233,3 +232,25 @@ currencyNameTwo.value =
   currencyNameTwo.value !== "EUR" ? "EUR" : setCurrencyNames();
 currencyNameThree.value =
   currencyNameThree.value !== "GBP" ? "GBP" : setCurrencyNames();
+
+// Set the currency values for the inputs
+const setCurrencyValues = async () => {
+  const currencyRates = [];
+  // Get the rate values for inputs except main input
+  for (let selectEl of currencySelectElements) {
+    if (selectEl !== currencyNameMain) {
+      currencyRates.push(
+        Number(
+          await getCurrencyData(currencyNameMain.value, selectEl.value)
+        ).toFixed(2)
+      );
+    }
+  }
+  // Set the rate values for the rate inputs
+  for (let i = 0; i < currencyRates.length; i++) {
+    rateInputElements[i].value = currencyRates[i];
+  }
+};
+setCurrencyValues();
+
+// Updates the currency values
